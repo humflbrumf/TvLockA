@@ -33,7 +33,6 @@ public class MainActivity extends Activity {
 
     public int counter;
     public boolean isDigit;
-    public boolean isPIN;
 
     Service mService;
     boolean mBound = false;
@@ -61,13 +60,13 @@ public class MainActivity extends Activity {
         Log.d(TAG,"onStart()");
         super.onStart();
         active = true;
-        isPIN = false;
         textViewStatus.setText("");
         imageViewPin1.setImageDrawable(getDrawable(R.drawable.pin_empty));
         imageViewPin2.setImageDrawable(getDrawable(R.drawable.pin_empty));
         imageViewPin3.setImageDrawable(getDrawable(R.drawable.pin_empty));
         imageViewPin4.setImageDrawable(getDrawable(R.drawable.pin_empty));
-        if ( !isServiceRunning(Service.class) ) {
+
+        if ( !isServiceRunning() ) {
             Log.d(TAG,"onStart() - startService()");
             Intent intent = new Intent(this, Service.class);
             startService(intent);
@@ -76,7 +75,7 @@ public class MainActivity extends Activity {
         else {
             Log.d(TAG,"onStart() - service already started");
         }
-        if ( isServiceRunning(Service.class) ) {
+        if ( isServiceRunning() ) {
             if (!mBound) {
                 Log.d(TAG,"onStart() - bindService()");
                 // Bind to Service
@@ -154,7 +153,7 @@ public class MainActivity extends Activity {
     {
         Log.d(TAG, "onKeyUp() = " + keyCode);
         if ( keyCode == KeyEvent.KEYCODE_S || keyCode == KeyEvent.KEYCODE_MEDIA_PLAY ){
-            if ( !isServiceRunning(Service.class) ) {
+            if ( !isServiceRunning() ) {
                 Intent intent = new Intent(this, Service.class);
                 startService(intent);
                 Toast.makeText(this, "startService(intent)", Toast.LENGTH_SHORT).show();
@@ -241,7 +240,6 @@ public class MainActivity extends Activity {
                         Log.d(TAG, "cannot setIsPIN(true) - service not bound");
                         Toast.makeText(this, "cannot setIsPIN(true) - service not bound", Toast.LENGTH_SHORT).show();
                     }
-                    isPIN = true;
                     textViewStatus.setText(getString(R.string.TextOkPIN));
                     textViewStatus.setTextColor(getResources().getColor(color.white));
                     textViewBitte.setTextColor(getResources().getColor(color.white));
@@ -286,10 +284,10 @@ public class MainActivity extends Activity {
         return true;
     }
 
-    private boolean isServiceRunning(Class<?> serviceClass) {
+    private boolean isServiceRunning() {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
+            if (Service.class.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }
